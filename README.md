@@ -85,11 +85,11 @@ S2C responseInventory {
 PROCEDURE
 ----
 PROCEDURE는 서버에서 C2S패킷을 수신했을 경우에 대한 핸들러입니다.<br>
-콜론 좌측에는 핸들링할 C2S패킷의 이름을 넣고,<br>
-콜론 우측에는 리스폰스할 S2C패킷의 이름을 넣습니다.<br>
-리스폰스는 생략 가능하며, 이 경우에는 콜론을 사용하지 않고 C2S패킷의 이름만 적습니다.
+'>' 좌측에는 핸들링할 C2S패킷의 이름을 넣고,<br>
+'>' 우측에는 리스폰스할 S2C패킷의 이름을 넣습니다.<br>
+리스폰스는 생략 가능하며, 이 경우에는 '>'를 사용하지 않고 C2S패킷의 이름만 적습니다.
 ```
-PROCEDURE login : responseLogin {
+PROCEDURE login > responseLogin {
   OUT->id = IN->id
   OUT->result =
     TABLE( user )
@@ -100,7 +100,7 @@ PROCEDURE login : responseLogin {
 }
 ```
 ```
-PROCEDURE queryInventory : responseInventory {
+PROCEDURE queryInventory > responseInventory {
   OUT->id = IN->id
   OUT->items =
     TABLE( inventory )
