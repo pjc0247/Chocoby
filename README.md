@@ -24,23 +24,26 @@ STRUCT item {
 }
 ```
 
+
 TABLE
 ----
-TABLE키워드로 테이블을 정의합니다.
+TABLE키워드로 테이블을 정의합니다.<br>
+변수 이름 뒤에 콜론을 찍고 기본값을 지정할 수 있습니다.
 ```
 TABLE user {
-  char(32) id primary
+  char(32) id PRIMARY
   char(32) password
   char(16) nickname
-  int level
+  int level : 0
 }
 ```
 ```
 TABLE inventory {
-  char(32) id primary
+  char(32) id PRIMARY
   item item
 }
 ```
+
 
 PACKET
 ----
@@ -60,7 +63,9 @@ C2S queryInventory {
 ```
 C2S forceLevelUp {
   char(32) id
+  int value : 1
 }
+```
 S2C는 ServerToClient패킷을 정의하는 키워드입니다.<br>
 서버로부터 클라이언트에 보낼 패킷을 정의합니다.
 ```
@@ -75,6 +80,7 @@ S2C responseInventory {
   item(ary) items;
 }
 ```
+
 
 PROCEDURE
 ----
@@ -107,5 +113,28 @@ PROCEDURE forceLevelUp {
   EXEC TABLE( user )
     ->WHERE( id, in->id )
     ->FIND(1)
-    ->INCR( level )
+    ->INCR( level, IN->value )
 }
+
+
+USAGE
+----
+C++
+```C++
+Chocoby::login(
+  id, password,
+  [](char id[32], int result){
+    if( result )
+      printf("login success\n");
+  });
+```
+
+
+RUBY
+```ruby
+Chocoby::login
+  :id => @id, :password => @password do |id, result|
+  
+  puts "login success" if result > 0 
+end
+```
