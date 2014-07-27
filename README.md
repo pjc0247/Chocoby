@@ -115,12 +115,12 @@ PROCEDURE forceLevelUp {
     ->FIND(1)
     ->INCR( level, IN->value )
 }
-
+```
 
 USAGE
 ----
 C++
-```C++
+```c++
 Chocoby::login(
   id, password,
   [](char id[32], int result){
