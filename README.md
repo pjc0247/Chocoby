@@ -119,7 +119,7 @@ PROCEDURE forceLevelUp {
 
 USAGE
 ----
-초코비 스크립트를 빌드하면 TARGET_LANGUAGE에서 사용할 수 있는 인터페이스 코드가 생성된다.
+초코비 스크립트를 빌드하면 TARGET_LANGUAGE에서 사용할 수 있는 인터페이스 코드가 생성된다.<br><br>
 C++
 ```c++
 Chocoby::login(
