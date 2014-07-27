@@ -29,6 +29,8 @@ PACKET force_level_up {
   }
 }
 ```
+UDPATE 패킷 예제2<br>
+닉네임을 바꾸는 패킷.
 ```
 PACKET change_nickname {
   char(32) id KEY user_table
@@ -39,6 +41,8 @@ PACKET change_nickname {
   }
 }
 ```
+INSERT 패킷 예제<br>
+아이템 추가 패킷.
 ```
 PACKET add_item {
   char(32) id FOR inventory_table
