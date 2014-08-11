@@ -39,11 +39,13 @@ poco::out(
 	"result" => "required",
 	"timestamp" => "timestamp" );
 
+/* 로직의 작성 */
 $user->password = $pw;
 $user->nickname = $nickname;
 if( $age != null )
 	$user->age = $age;
 	
+/* 결과값 기입 */
 $result = 0;
 	
 /* response는 자동으로 보내진다. (JSON 또는 XML) */
