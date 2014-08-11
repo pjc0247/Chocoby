@@ -5,9 +5,11 @@
 PHP STYLE
 ----
 코드의 상단부에 IN, OUT 항목들과 그 속성을 기술한다.<br>
-in, out에 대한 기술은, GET/POST로 넘어온 값을 PHP value와 매칭시켜주는 역할,
-RESPONSE로 넘겨줄 값을 PHP value와 매칭시켜주는 역할, 
-항목이 유효한지 검증하는 역할, DB의 컬럼과 연관 있는 항목일 경우 해당 열을 바로 PHP value로 받아오는 역할을 한다.
+    * in, out에 대한 기술은
+    * GET/POST로 넘어온 값을 PHP value와 매칭시켜주는 역할,<br>
+    * RESPONSE로 넘겨줄 값을 PHP value와 매칭시켜주는 역할, <br>
+    * 항목이 유효한지 검증하는 역할,<br>
+    * DB의 컬럼과 연관 있는 항목일 경우 해당 열을 바로 PHP value로 받아오는 역할을 한다.
 <br>
 그 아래에 로직을 작성한다.<br>
 DB 접근은 ORM을 사용하며, 변경 값은 response 이후 자동으로 커밋된다.
