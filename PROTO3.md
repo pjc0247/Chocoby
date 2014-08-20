@@ -21,6 +21,10 @@ PHP STYLE
   * as[name] : 이 항목을 [name]의 이름으로 된 PHP변수로 가져온다. (기본값은 파라미터 이름)
   * pk[table,name]  : 이 항목은 [table]에서의 PK임을 명시, 이 항목을 KEY로 삼아서 [table]에서 행을 가져와 [name]이름의 변수에 담는다.
   * disable_autocommit : pk로 행을 가져온 경우, 그 행에 대한 오토커밋을 금지한다.
+  * va-rex[expression] : expression의 정규식으로 검증(validation) 한다.
+  * va-range[min,max] : min~max사이의 값인지 검증한다.
+  * va-length[len] : len길이의 문자열인지 검증한다.
+  * va-length[min,max] : min~max사이 길이의 문자열인지 검증한다.
 * attributes - out
   * required : 이 항목은 필수임을 명시
   * optional : 이 항목은 필수가 아님을 명시 (기본값)
