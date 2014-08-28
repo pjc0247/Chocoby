@@ -1,10 +1,13 @@
 <?php namespace CO;
-require_once "idiorm.php";
+require_once __DIR__."/idiorm.php";
+require_once __DIR__."/chocoby_err.php";
+require_once __DIR__."/chocoby_config.php";
 
 $fetch_src = $_GET;
 $in_buffer = Array();
 $out_buffer = Array();
 $autocommits = Array();
+$errno = ERR\NONE;
 
 /* interfaces */
 function in($in_ary){
@@ -25,10 +28,39 @@ function out($out_ary){
 		$out_buffer[$key] = $parsed;
 	}
 }
+function set_errno($no){
+	GLOBAL $errno;
+	$errno = $no;
+}
+function abort($no, $reason){
+	set_errno($no);
+
+	if( CONFIG\DEBUG ){
+		$result = 
+			[CONFIG\RESULT_KEY => $no,
+			CONFIG\REASON_KEY => $reason];
+	}
+	else{
+		$result = 
+			[CONFIG\RESULT_KEY => $no];
+	}
+
+	exit(json_encode(
+		$result));
+}
 
 /* backends */
+function flush_db(){
+	GLOBAL $autocommits;
+
+	foreach($autocommits as $row){
+		if( $row != null )
+			$row->save();
+	}
+}
 function on_response(){
 	GLOBAL $out_buffer;
+	GLOBAL $errno;
 
 	$responses = Array();
 
@@ -37,6 +69,8 @@ function on_response(){
 		$responses[$key] = $value;
 	}
 
+	flush_db();
+	
 	echo json_encode( $responses );
 }
 function initialize(){
@@ -50,7 +84,10 @@ function lex_opts($opts){
 	foreach($tokens as $token){
 		preg_match_all("/^(?<opt>[^\[]+)(\[(?<params>.+)\])?/", $token, $result);
 		
-		$opt = $result["opt"][0];
+		$opt = null;
+		$params = null;
+		if( $result["opt"] != null)
+			$opt = $result["opt"][0];
 		if( $result["params"] != null )
 			$params = split(",", $result["params"][0]);
 
@@ -63,11 +100,15 @@ function lex_opts($opts){
 
 function process_in_opts($key, $opts){
 	GLOBAL $fetch_src;
+	GLOBAL $autocommits;
 
 	$autocommit = true;
 	$invalid_value = false;
 	$glob_name = $key;
-	$value = $fetch_src[$key];
+
+	if( array_key_exists($key, $fetch_src) )
+		$value = $fetch_src[$key];
+	$dst_value = $value;
 
 	foreach($opts as $opt){
 		$params = $opt["params"];
@@ -84,7 +125,18 @@ function process_in_opts($key, $opts){
 				$glob_name = $params[0];
 				break;
 
+			/* pk [table,(column_name)] */
 			case "pk":
+				if( count($params) == 1 )
+					$column_name = $key;
+				else
+					$column_name = $params[1];
+
+				$table = \ORM::for_table($params[0]);
+				$row = $table
+					->where($column_name, $value)
+					->find_one();
+				$dst_value = $row;
 				break;
 			case "disable_autocommit":
 				$autocommit = false;
@@ -122,22 +174,25 @@ function process_in_opts($key, $opts){
 		}
 	}
 
-	$GLOBALS[$glob_name] = $value;
+	$GLOBALS[$glob_name] = $dst_value;
 
 	if( $invalid_value )
-		echo "invalid";
-	//if( $autocommit )
-//		$autocommits
+		abort(
+			ERR\INVALID_PARAM,
+			"invalid parameter - in::${key}");
+	if( $autocommit )
+		array_push($autocommits, $row);
 }
 function process_out_opts($key, $opts){
 	$glob_name = $key;
+	$required = false;
 
-	//echo var_dump($opts);
 	foreach($opts as $opt){
 		$params = $opt["params"];
 
 		switch( $opt["opt"] ){
 			case "required":
+				$required = true;
 				break;
 			case "optional":
 				break;
@@ -147,25 +202,37 @@ function process_out_opts($key, $opts){
 				break;
 
 			case "timestamp":
-				
-				break;
+				return time();
 		}
 	}
 
-	return $GLOBALS[$glob_name];
+	if( array_key_exists($glob_name, $GLOBALS) )
+		return $GLOBALS[$glob_name];
+	else if( $required )
+		abort(
+			ERR\INTERNAL_ERROR,
+			"required field is null - out::${key}");
+	else
+		return null;
 }
 
 initialize();
 
+\ORM::configure('mysql:host=' . "localhost" . ';dbname=' . "test");
+\ORM::configure('username', "root");
+\ORM::configure('password', "asdf1234");
+
 in([
-  "level" => "required pk[a,b] as[player_level] va-length[4]"
+  "asdf" => "required pk[account,nickname] as[player_level] va-length[4] disable_autocommit"
   ]);
 out([
-  "result" => "",
-  "sex" => "from[buta]\"
+  "result" => "required",
+  "sex" => ""
   ]);
 
-echo is_numeric("23f");
+//echo $player_level;
+
+$player_level->nickname = "qqqq";
 
 on_response();
 ?>
